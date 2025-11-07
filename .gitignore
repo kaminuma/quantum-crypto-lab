@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.env
+.venv/
+.ipynb_checkpoints/
+.envrc
+.DS_Store
+.notebooks_cache/
+.cache/
+*.log
+results/
