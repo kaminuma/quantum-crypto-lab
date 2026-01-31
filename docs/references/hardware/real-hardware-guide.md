@@ -1,14 +1,16 @@
 # 実機実行ガイド
 
+> **注**: 本リポジトリのN=35実験ではAWS Braket（Rigetti Ankaa-3）のみを使用しているため、本ガイドではAWSの導入手順のみ記載しています。
+
 > **注意**: 本ガイドのデバイス名・価格・無料枠条件は執筆時点（2026年1月）のものです。最新情報は各クラウドベンダーの公式ページを参照してください。
 
 > **免責**: 本リポジトリのShor実装は教育・実証目的のcompiled circuitを含み、大規模Nに対する汎用RSA破りを目的とするものではありません。
 
 ## 概要
 
-AWS BraketまたはIBM Quantumを使用して、Shorのアルゴリズムを実際の量子ハードウェアで実行する方法。
+AWS Braketを使用して、Shorのアルゴリズムを実際の量子ハードウェアで実行する方法。
 
-## 方法1: AWS Braket
+## AWS Braket
 
 ### セットアップ
 
@@ -75,71 +77,6 @@ counts = backend_real.run(circuit, shots=100)
 
 ---
 
-## 方法2: IBM Quantum
-
-### セットアップ
-
-```bash
-# IBM Quantum Runtimeをインストール
-pip install qiskit-ibm-runtime
-
-# またはプロジェクトと一緒にインストール
-pip install -e ".[ibm]"
-```
-
-### APIトークンの取得
-
-1. https://quantum.ibm.com/ でアカウント作成
-2. Dashboard → API Token へ移動
-3. トークンをコピー
-
-### 認証情報の保存
-
-```python
-from quantum_rsa.backends import IBMQuantumBackend
-
-# トークンを保存（一度だけ必要）
-IBMQuantumBackend.save_account("YOUR_API_TOKEN_HERE")
-```
-
-### 利用可能なデバイス（無料枠）
-
-| デバイス | 量子ビット | 場所 | 備考 |
-|---------|-----------|------|------|
-| **ibm_kyoto** | 127 | 日本 | 可用性良好 |
-| **ibm_osaka** | 127 | 日本 | 可用性良好 |
-| **ibm_sherbrooke** | 127 | カナダ | 混雑しがち |
-| **ibm_brisbane** | 127 | オーストラリア | 可用性良好 |
-
-### 使用方法
-
-```python
-from quantum_rsa.backends import IBMQuantumBackend
-from quantum_rsa.algorithms import QuantumShor
-from quantum_rsa.modexp import get_config
-
-# 利用可能なバックエンドを一覧表示
-backends = IBMQuantumBackend.list_backends()
-for b in backends:
-    print(f"{b['name']}: {b['num_qubits']} qubits, {b['pending_jobs']} jobs queued")
-
-# 初期化（最も空いているものを自動選択）
-backend = IBMQuantumBackend()
-
-# またはバックエンドを指定
-backend = IBMQuantumBackend(backend_name="ibm_kyoto")
-
-# 実行
-shor = QuantumShor()
-config = get_config(15)
-circuit = shor._construct_circuit(7, 15, config)
-
-counts = backend.run(circuit, shots=1000)
-print(counts)
-```
-
----
-
 ## 重要な注意点
 
 ### 1. 回路最適化
@@ -189,10 +126,6 @@ result = run_shor(77, method='quantum', shots=1000)
 - IonQ: 1回あたり約$3-10（100 shots）
 - Rigetti: 1回あたり約$0.05（100 shots）
 
-**IBM Quantum:**
-- 無料枠: 月10分
-- 従量課金も利用可能
-
 ---
 
 ## クイックスタートスクリプト
@@ -203,19 +136,12 @@ result = run_shor(77, method='quantum', shots=1000)
 
 from quantum_rsa.runner import run_shor
 
-# 方法1: AWS Braket
+# AWS Braket
 # pip install amazon-braket-sdk
 # aws configure
 
 from quantum_rsa.backends import AWSBraketBackend
 backend = AWSBraketBackend(device="sv1")  # まずシミュレータで
-
-# 方法2: IBM Quantum
-# pip install qiskit-ibm-runtime
-# IBMQuantumBackend.save_account("YOUR_TOKEN")
-
-# from quantum_rsa.backends import IBMQuantumBackend
-# backend = IBMQuantumBackend()
 
 # N=15で実行
 from quantum_rsa.algorithms import QuantumShor
@@ -244,13 +170,6 @@ from qiskit import transpile
 basis_gates = ['h', 'cx', 'rz', 'rx', 'ry', 'x', 'y', 'z']
 circuit_decomposed = transpile(circuit, basis_gates=basis_gates, optimization_level=3)
 ```
-
-### "Job queue is long"
-
-IBM Quantum無料枠はキューが長い。対処法:
-- 別のバックエンドを試す（ibm_brisbaneは比較的空いていることが多い）
-- AWS Braketを使用（従量課金、キューなし）
-- オフピーク時間に実行
 
 ### "Results are too noisy"
 
