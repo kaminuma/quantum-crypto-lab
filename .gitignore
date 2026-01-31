@@ -10,3 +10,9 @@ __pycache__/
 *.log
 results/
 *.output.ipynb
+
+# Experiment logs (contain AWS account IDs)
+logs/
+
+# Claude Code local config
+.claude/
