@@ -505,8 +505,6 @@ quantum-rsa-lab/
 │   └── n35_a8_optimized.py  # a=8回路
 ├── scripts/
 │   └── run_n35_experiments.py  # 実験スクリプト
-├── logs/
-│   └── n35-*.json  # 生データ
 └── docs/reports/
     └── 2026-01-31-n35-comparison-report.md  # 本レポート
 ```
