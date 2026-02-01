@@ -409,7 +409,7 @@ Rigetti Ankaa-3での実機実験により：
 
 ### A.1 リポジトリ
 
-実験に使用したコードは以下のリポジトリで公開予定：
+実験に使用したコードは以下のリポジトリで公開：
 
 ```
 https://github.com/kaminuma/quantum-rsa-lab
